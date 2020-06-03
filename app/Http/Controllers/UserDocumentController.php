@@ -62,7 +62,7 @@ class UserDocumentController extends Controller
                 array_push($documentResponse,[
                     'id' => $userDocument->id,
                     'title' => $userDocument->document->name,
-                    'is_signed' => $userDocument->signed
+                    'is_signed' => $userDocument->signed == 1 ? true : false
                 ]);
             }
             return response()->json([
