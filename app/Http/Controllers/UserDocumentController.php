@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Its\Sso\OpenIDConnectClient;
 use Its\Sso\OpenIDConnectClientException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserDocumentController extends Controller
 {
@@ -127,7 +128,20 @@ class UserDocumentController extends Controller
     {
         $documentId = $request->document_id;
         $client = new Client();
-        $response = $client->get(env('FILE_STORAGE_URL') . '/documents/' . $documentId);
+        $response = $client->request(
+            'GET', env('FILE_STORAGE_URL') . '/documents/' . $documentId, ['stream' => true]
+        );
+
+        $body = $response->getBody();
+
+        $response = new StreamedResponse(function() use ($body) {
+            while (!$body->eof()) {
+                echo $body->read(1024);
+            }
+        });
+
+        $response->headers->set('Content-Type', 'application/pdf');
+
         return $response;
     }
 }
