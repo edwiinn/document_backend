@@ -127,9 +127,11 @@ class UserDocumentController extends Controller
     public function getDocumentByDocumentId(Request $request)
     {
         $documentId = $request->document_id;
+        $userDocument = UserDocument::find($documentId);
+        if ($userDocument == null) return response()->json(['message' => 'Not Found' ], 404);
         $client = new Client();
         $response = $client->request(
-            'GET', env('FILE_STORAGE_URL') . '/documents/' . $documentId, ['stream' => true]
+            'GET', env('FILE_STORAGE_URL') . '/documents/' . $userDocument->document_id, ['stream' => true]
         );
         $contentDisposition = $response->getHeader('Content-Disposition');
         $body = $response->getBody();
