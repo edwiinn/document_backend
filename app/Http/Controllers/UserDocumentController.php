@@ -104,7 +104,7 @@ class UserDocumentController extends Controller
         if ($introspect->active == false) return response()->json([ 'message' => 'Unauthorized' ], 401);
         $userDocumentId = $request->user_document_id;
         $document = $request->file('document');
-        $userDocument = UserDocument::find($userDocumentId);
+        $userDocument = UserDocument::with('document')->find($userDocumentId);
         if ($userDocument == null) return response()->json(['message' => 'User Dokumen tidak Ditemukan'], 404);
         if ($userDocument->user_id !== $introspect->sub) return response()->json([ 'message' => 'Unauthorized' ], 401);
         $client = new Client();
@@ -113,7 +113,7 @@ class UserDocumentController extends Controller
                 [
                     'name'     => 'document',
                     'contents' => file_get_contents($document->getRealPath()),
-                    'filename' => $document->getClientOriginalName() 
+                    'filename' =>  $userDocument->document->name
                 ]
             ]
         ]);
