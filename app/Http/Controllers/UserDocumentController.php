@@ -131,7 +131,7 @@ class UserDocumentController extends Controller
         $response = $client->request(
             'GET', env('FILE_STORAGE_URL') . '/documents/' . $documentId, ['stream' => true]
         );
-
+        $contentDisposition = $response->getHeader('Content-Disposition');
         $body = $response->getBody();
 
         $response = new StreamedResponse(function() use ($body) {
@@ -141,6 +141,7 @@ class UserDocumentController extends Controller
         });
 
         $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', $contentDisposition);
 
         return $response;
     }
